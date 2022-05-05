@@ -34,6 +34,14 @@ def login(username, password):
 
 
 # ============ Internal Functions ==============
+def _isSolution(hashedPass, negPass):
+    for entry in negPass:
+        if (len(entry) != len(negPass)):
+            return False
+        for i in range(len(entry)):
+             if (entry[i] != '*' and entry[i] == hashedPass[i]):
+                 return False
+    return True
 
 def _getHash(password):
   m = hashlib.sha256()
