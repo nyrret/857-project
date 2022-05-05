@@ -14,20 +14,20 @@ authDB = {}
 def register(username, password):
   if username in authDB:
     # TODO: raise a better error
-    raise Error("username already exists")
+    raise Exception("username already exists")
 
-  hashedPassHex = getHash(password)
-  # hashedPassBits = BitArray(hex=hashedPassHex).bin[2:] # strip leading 0b
+  hashedPass = getHash(password)
+  hashedPassBits = BitArray(hex=hashedPass.hex()).bin[2:] # strip leading 0b
 
   negPass = getNegPass(hashedPassBits)
-  enp = encryptAES(hashedPassHex.encode('utf-8'), negPass) # probably replace this with python library encrypt func
+  enp = encryptAES(hashedPass, negPass) # probably replace this with python library encrypt func
 
   authDB[username] = enp
 
 
 def login(username, password):
   if username not in authDB:
-    raise Error(f"noo account for username {username} exists")
+    raise Exception(f"no account for username {username} exists")
 
   enp = authDB[username]
   hashedPass = getHash(password)
@@ -37,7 +37,7 @@ def login(username, password):
     return True
 
   else:
-    raise Error(f"incorrect password")
+    raise Exception(f"incorrect password")
 
 
 # ============ Internal Functions ==============
