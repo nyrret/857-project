@@ -1,3 +1,5 @@
+import hashlib
+
 # maps usernames to ENPs
 authDB = {}
 
@@ -7,7 +9,7 @@ def register(username, password):
     # TODO: raise a better error
     raise Error("username already exists")
 
-  hashedPass = getHash(password)
+  hashedPass = hashlib.sha256(password)
   negPass = getNegPass(hashedPass)
   enp = encrypt(hashedPass, negPass) # probably replace this with python library encrypt func
 
@@ -19,7 +21,7 @@ def login(username, password):
     raise Error(f"noo account for uesrname {username} exists")
 
   enp = authDB[username]
-  hashedPass = getHash(pasword)
+  hashedPass = hashlib.sha256(pasword)
   negPass = decrypt(hashedPass, enp)
   
   if isSolution(hashedPass, negPass):
