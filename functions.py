@@ -4,6 +4,8 @@ import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.fernet import Fernet
 import numpy as np
+import base64
+import pickle
 
 # maps usernames to ENPs
 authDB = {}
@@ -14,11 +16,11 @@ def register(username, password):
     # TODO: raise a better error
     raise Error("username already exists")
 
-  hashedPassHex = _getHash(password)
+  hashedPassHex = getHash(password)
   # hashedPassBits = BitArray(hex=hashedPassHex).bin[2:] # strip leading 0b
 
-  negPass = _getNegPass(hashedPassBits)
-  enp = _encryptAES(hashedPassHex.encode('utf-8'), negPass) # probably replace this with python library encrypt func
+  negPass = getNegPass(hashedPassBits)
+  enp = encryptAES(hashedPassHex.encode('utf-8'), negPass) # probably replace this with python library encrypt func
 
   authDB[username] = enp
 
@@ -28,10 +30,10 @@ def login(username, password):
     raise Error(f"noo account for username {username} exists")
 
   enp = authDB[username]
-  hashedPass = _getHash(password)
-  negPass = _decryptAES(hashedPass, enp)
+  hashedPass = getHash(password)
+  negPass = decryptAES(hashedPass, enp)
   
-  if _isSolution(hashedPass, negPass):
+  if isSolution(hashedPass, negPass):
     return True
 
   else:
@@ -39,7 +41,7 @@ def login(username, password):
 
 
 # ============ Internal Functions ==============
-def _isSolution(hashedPass, negPass):
+def isSolution(hashedPass, negPass):
     for entry in negPass:
         if (len(entry) != len(negPass)):
             return False
@@ -48,7 +50,7 @@ def _isSolution(hashedPass, negPass):
                  return False
     return True
 
-def _getHash(password):
+def getHash(password):
   m = hashlib.sha256()
   # m = hashlib.sha1()  # 128 bits
   m.update(password.encode("utf-8"))
@@ -57,11 +59,11 @@ def _getHash(password):
 
 
 # key -- in bytes
-def _encryptAES(key, plaintext):
+# plaintext -- in bytes
+def encryptAES(key, plaintext):
   # 128-bit encryption
-  import base64
   f = Fernet(base64.urlsafe_b64encode(key))
-  ct = f.encrypt(plaintext)
+  ct = f.encrypt(pickle.dumps(plaintext))
   
 
   # TODO -- 256
@@ -72,14 +74,14 @@ def _encryptAES(key, plaintext):
 
   return ct
 
-def _decryptAES(key, ct):
+# key -- in bytes
+def decryptAES(key, ct):
   # TODO -- 256
   # decryptor = cipher.decryptor()
   # return decryptor.udpate(ct) + decryptor.finalize()
 
-  import base64
   f = Fernet(base64.urlsafe_b64encode(key))
-  return f.decrypt(ct)
+  return pickle.loads(f.decrypt(ct))
 
 def getNegPass(hashedPass):
 	permutation = np.random.permutation(len(hashedPass))
