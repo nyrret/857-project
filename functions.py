@@ -27,3 +27,12 @@ def login(username, password):
 
   else:
     raise Error(f"incorrect pasword")
+
+def isSolution(hashedPass, negPass):
+    for entry in negPass:
+        if (len(entry) != len(negPass)):
+            return False
+        for i in range(len(entry)):
+             if (entry[i] != '*' and entry[i] == hashedPass[i]):
+                 return False
+    return True
