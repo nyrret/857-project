@@ -18,4 +18,12 @@ def login(username, password):
   if username not in authDB:
     raise Error(f"noo account for uesrname {username} exists")
 
+  enp = authDB[username]
+  hashedPass = getHash(pasword)
+  negPass = decrypt(hashedPass, enp)
+  
+  if isSolution(hashedPass, negPass):
+    return True
 
+  else:
+    raise Error(f"incorrect pasword")
