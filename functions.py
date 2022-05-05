@@ -118,3 +118,6 @@ def inversePermute(permutedString, permutation):
 	for i in range(len(permutedString)):
 		bitString += permutedString[np.nonzero(permutation==i)[0][0]]
 	return bitString
+
+register("user42", "coolpassword")
+login("user42", "coolpassword4")
