@@ -2,3 +2,4 @@ Requirements
 ==============
 
 - bistring
+- cryptography
