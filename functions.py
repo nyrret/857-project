@@ -18,7 +18,7 @@ def register(username, password):
   # hashedPassBits = BitArray(hex=hashedPassHex).bin[2:] # strip leading 0b
 
   negPass = _getNegPass(hashedPassBits)
-  enp = _encrypt(hashedPassHex.encode('utf-8'), negPass) # probably replace this with python library encrypt func
+  enp = _encryptAES(hashedPassHex.encode('utf-8'), negPass) # probably replace this with python library encrypt func
 
   authDB[username] = enp
 
@@ -29,7 +29,7 @@ def login(username, password):
 
   enp = authDB[username]
   hashedPass = _getHash(password)
-  negPass = _decrypt(hashedPass, enp)
+  negPass = _decryptAES(hashedPass, enp)
   
   if _isSolution(hashedPass, negPass):
     return True
@@ -49,9 +49,8 @@ def _isSolution(hashedPass, negPass):
     return True
 
 def _getHash(password):
-  # m = hashlib.sha256()
-  
-  m = hashlib.sha1()  # 128 bits
+  m = hashlib.sha256()
+  # m = hashlib.sha1()  # 128 bits
   m.update(password.encode("utf-8"))
 
   return m.digest()
@@ -74,8 +73,13 @@ def _encryptAES(key, plaintext):
   return ct
 
 def _decryptAES(key, ct):
-  decryptor = cipher.decryptor()
-  return decryptor.udpate(ct) + decryptor.finalize()
+  # TODO -- 256
+  # decryptor = cipher.decryptor()
+  # return decryptor.udpate(ct) + decryptor.finalize()
+
+  import base64
+  f = Fernet(base64.urlsafe_b64encode(key))
+  return f.decrypt(ct)
 
 def getNegPass(hashedPass):
 	permutation = np.random.permutation(len(hashedPass))
