@@ -3,6 +3,7 @@ import hashlib
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.fernet import Fernet
+import numpy as np
 
 # maps usernames to ENPs
 authDB = {}
@@ -24,20 +25,28 @@ def register(username, password):
 
 def login(username, password):
   if username not in authDB:
-    raise Error(f"noo account for uesrname {username} exists")
+    raise Error(f"noo account for username {username} exists")
 
   enp = authDB[username]
-  hashedPass = _getHash(pasword)
+  hashedPass = _getHash(password)
   negPass = _decrypt(hashedPass, enp)
   
   if _isSolution(hashedPass, negPass):
     return True
 
   else:
-    raise Error(f"incorrect pasword")
+    raise Error(f"incorrect password")
 
 
 # ============ Internal Functions ==============
+def _isSolution(hashedPass, negPass):
+    for entry in negPass:
+        if (len(entry) != len(negPass)):
+            return False
+        for i in range(len(entry)):
+             if (entry[i] != '*' and entry[i] == hashedPass[i]):
+                 return False
+    return True
 
 def _getHash(password):
   # m = hashlib.sha256()
@@ -64,7 +73,31 @@ def _encryptAES(key, plaintext):
 
   return ct
 
-
 def _decryptAES(key, ct):
   decryptor = cipher.decryptor()
   return decryptor.udpate(ct) + decryptor.finalize()
+
+def getNegPass(hashedPass):
+	permutation = np.random.permutation(len(hashedPass))
+	permutedPass = permute(hashedPass, permutation)
+	negativeDB=[]
+	for i in range(len(permutedPass)):
+		negativeDB.append(inversePermute(permutedPass[:i]+opposite(permutedPass[i]) + "*"*(len(permutedPass)-i-1), permutation))
+	return negativeDB
+
+def opposite(bit):
+	if bit=="1":
+		return "0"
+	else: return "1"
+
+def permute(bitString, permutation):
+	permutedString=""
+	for i in range(len(permutation)):
+		permutedString += bitString[permutation[i]]
+	return permutedString
+
+def inversePermute(permutedString, permutation):
+	bitString=""
+	for i in range(len(permutedString)):
+		bitString += permutedString[np.nonzero(permutation==i)[0][0]]
+	return bitString
