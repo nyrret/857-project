@@ -2,7 +2,7 @@ from bitstring import BitArray
 import hashlib
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import numpy as np
 import base64
 import pickle
@@ -31,7 +31,11 @@ def login(username, password):
 
   enp = authDB[username]
   hashedPass = getHash(password)
-  negPass = decryptAES(hashedPass, enp)
+  try:
+    negPass = decryptAES(hashedPass, enp)
+  except InvalidToken:
+    raise Exception("incorrect password")
+
   hashedPassBits = BitArray(hex=hashedPass.hex()).bin[2:] # strip leading 0b
   
   if isSolution(hashedPassBits, negPass):
