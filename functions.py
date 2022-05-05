@@ -22,14 +22,14 @@ def login(username, password):
     raise Error(f"noo account for uesrname {username} exists")
 
   enp = authDB[username]
-  hashedPass = _getHash(pasword)
+  hashedPass = _getHash(password)
   negPass = _decrypt(hashedPass, enp)
   
   if _isSolution(hashedPass, negPass):
     return True
 
   else:
-    raise Error(f"incorrect pasword")
+    raise Error(f"incorrect password")
 
 
 
