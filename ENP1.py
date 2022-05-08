@@ -46,16 +46,31 @@ def login(username, password):
 
 
 # ============ Internal Functions ==============
-def isSolution(hashedPass, negPass):
+def isSolutionEasy(hashedPass, negPass):
   for entry in negPass:
-    # if (len(entry) != len(negPass)):
-    #   print("wrong length")
-    #   return False
-    # for i in range(len(entry)):
-    #   if (entry[i] != '*' and entry[i] != hashedPass[i]):
-      if matches(hashedPass, entry):
-        return False
+    if matches(hashedPass, entry):
+      return False
   return True
+
+def isSolution(hashedPass, negPass):
+  for i, entry in enumerate(negPass):
+    if (numberOfSp(entry) != i+1):
+      return False
+  x = list(' '*len(hashedPass))
+  for i, entry in enumerate(negPass):
+    if (numberOfSp(entry) != 1):
+      return False
+    
+    k = indexOfSp(entry)
+    x[k] = '0' if entry[k] == '1' else '1'
+    for j in range(i+1, len(negPass)):
+      if (negPass[j][k] != x[k]):
+        return False
+      negPass[j] = negPass[j][:k]+'*'+negPass[j][k+1:]
+  
+  if "".join(x) == hashedPass:
+    return True
+  return False
 
 def matches(hashedPass, databaseEntry):
 	if len(hashedPass) != len(databaseEntry):
@@ -64,6 +79,15 @@ def matches(hashedPass, databaseEntry):
 		if databaseEntry[i] != "*" and databaseEntry[i] != hashedPass[i]:
 			return False
 	return True
+
+def numberOfSp(entry):
+  return len(entry) - entry.count('*')
+
+def indexOfSp(entry):
+  onePos = entry.find('1')
+  if onePos > -1:
+    return onePos
+  return entry.find('0')
 
 def getHash(password):
   m = hashlib.sha256()
@@ -124,4 +148,4 @@ def inversePermute(permutedString, permutation):
 	return bitString
 
 register("user42", "coolpassword")
-login("user42", "coolpassword4")
+login("user42", "coolpassword")
