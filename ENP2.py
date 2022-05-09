@@ -210,11 +210,10 @@ def permute(bitString, permutation):
 	return permutedString
 
 def inversePermute(permutedString, permutation):
-  return permutedString
-	# bitString=""
-	# for i in range(len(permutedString)):
-	# 	bitString += permutedString[np.nonzero(permutation==i)[0][0]]
-	# return bitString
+	bitString=""
+	for i in range(len(permutedString)):
+		bitString += permutedString[np.nonzero(permutation==i)[0][0]]
+	return bitString
 
 
 # db = getNegPass("1100101100001")
