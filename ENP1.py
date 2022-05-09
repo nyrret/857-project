@@ -6,6 +6,9 @@ from cryptography.fernet import Fernet, InvalidToken
 import numpy as np
 import base64
 import pickle
+import string
+import random
+import time
 
 # maps usernames to ENPs
 authDB = {}
@@ -147,5 +150,36 @@ def inversePermute(permutedString, permutation):
 		bitString += permutedString[np.nonzero(permutation==i)[0][0]]
 	return bitString
 
-register("user42", "coolpassword")
-login("user42", "coolpassword")
+def test(iters):
+    lower = string.ascii_lowercase
+    upper = string.ascii_uppercase
+    num = string.digits
+    symbols = string.punctuation
+    all = lower + upper + num + symbols
+
+    users = {}
+    for i in range(iters):
+        password = randomString(all, 14)
+        user = randomString(all, 10)
+        users[user] = password
+    
+
+    startTime = time.perf_counter()
+    for user in users:
+        register(user, users[user])
+    endTime = time.perf_counter()
+    print("registry", endTime - startTime)
+
+    startTime = time.perf_counter()
+    for user in users:
+        login(user, users[user])
+    endTime = time.perf_counter()
+    print("login", endTime-startTime)
+    
+
+def randomString(params, length):
+    temp = random.sample(params,length)
+    password = "".join(temp)
+    return password
+
+test(100)

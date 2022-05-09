@@ -1,3 +1,4 @@
+from tracemalloc import start
 from bitstring import BitArray
 import hashlib
 import os
@@ -7,6 +8,9 @@ import numpy as np
 import base64
 import pickle
 from numpy.random import default_rng
+import string
+import random
+import time
 
 # maps usernames to ENPs
 authDB = {}
@@ -40,7 +44,7 @@ def login(username, password):
 
   hashedPassBits = BitArray(hex=hashedPass.hex()).bin[2:] # strip leading 0b
   
-  if isSolutionEasy(hashedPassBits, negPass):
+  if isSolution(hashedPassBits, negPass):
     return True
 
   else:
@@ -216,8 +220,36 @@ def inversePermute(permutedString, permutation):
 	return bitString
 
 
-# db = getNegPass("1100101100001")
-# print(db)
+def test(iters):
+    lower = string.ascii_lowercase
+    upper = string.ascii_uppercase
+    num = string.digits
+    symbols = string.punctuation
+    all = lower + upper + num + symbols
 
-register("user42", "coolpassword")
-login("user42", "coolpassword")
+    users = {}
+    for i in range(iters):
+        password = randomString(all, 14)
+        user = randomString(all, 10)
+        users[user] = password
+    
+
+    startTime = time.perf_counter()
+    for user in users:
+        register(user, users[user])
+    endTime = time.perf_counter()
+    print("registry", endTime - startTime)
+
+    startTime = time.perf_counter()
+    for user in users:
+        login(user, users[user])
+    endTime = time.perf_counter()
+    print("login", endTime-startTime)
+    
+
+def randomString(params, length):
+    temp = random.sample(params,length)
+    password = "".join(temp)
+    return password
+
+test(10)
