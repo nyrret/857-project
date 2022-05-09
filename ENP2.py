@@ -40,7 +40,7 @@ def login(username, password):
 
   hashedPassBits = BitArray(hex=hashedPass.hex()).bin[2:] # strip leading 0b
   
-  if isSolution(hashedPassBits, negPass):
+  if isSolutionEasy(hashedPassBits, negPass):
     return True
 
   else:
@@ -70,13 +70,13 @@ def isSolution(hashedPass, negPass):
       return False
   negPass[m-1] = merge(negPass[m], negPass[m+2])
   x = list(' '*len(hashedPass))
-  for i in range(m, -1, -1):
+  for i in range(m-1, -1, -1):
       if numberOfSp(negPass[i]) != 1:
           return False
       k = indexOfSp(negPass[i])
-      x[k] = '0' if entry[k] == '1' else '1'
+      x[k] = '0' if negPass[i][k] == '1' else '1'
       for j in range(i-1, -1,-1):
-        if negPass[j][k] != x[k] or negPass[j][k] != '*':
+        if negPass[j][k] != x[k] and negPass[j][k] != '*':
           return False
         negPass[j] = negPass[j][:k]+'*'+negPass[j][k+1:]
   if "".join(x) == hashedPass:
@@ -156,7 +156,7 @@ def decryptAES(key, ct):
 def getNegPass(hashedPass):
   permutation = np.random.permutation(len(hashedPass))
   permutedPass = permute(hashedPass, permutation)
-  print(permutedPass)
+#   print(permutedPass)
   negativeDB=[]
   for i in range(len(permutedPass)-1, 1, -1): #One of these steps works if the first two bits agree
     j, k = rng.integers(low=0, high=i, size=2)
@@ -217,5 +217,8 @@ def inversePermute(permutedString, permutation):
 	# return bitString
 
 
-db = getNegPass("1100101100001")
-print(db)
+# db = getNegPass("1100101100001")
+# print(db)
+
+register("user42", "coolpassword")
+login("user42", "coolpassword")
